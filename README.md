@@ -16,16 +16,29 @@ Voice-first AI application for medication reminders and adherence.
 
 ## Backend setup
 
+**macOS / Linux (zsh/bash):**
+
 ```bash
 cd backend
-python -m venv .venv && .venv\Scripts\activate   # or source .venv/bin/activate
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env   # fill in Supabase + LiveKit + Anthropic + ElevenLabs keys
 ```
 
+**Windows (PowerShell):**
+
+```powershell
+cd backend
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+copy .env.example .env
+```
+
 1. In the Supabase SQL editor, run `backend/sql/schema.sql`.
 2. Enable email/password auth in Supabase Auth settings.
-3. Run the API:
+3. Run the API (same command on every OS once the venv is active):
 
 ```bash
 uvicorn app.main:app --reload --app-dir backend
@@ -35,13 +48,33 @@ API is now at `http://localhost:8000` (`/health` for a liveness check).
 
 ## Voice agent setup
 
+**macOS / Linux (zsh/bash):**
+
 ```bash
 cd agent
-python -m venv .venv && .venv\Scripts\activate
+python3 -m venv .venv
+source .venv/bin/activate
 pip install -r requirements.txt
 cp .env.example .env   # same LiveKit project + provider keys as backend
+python -m agent.main download-files   # one-time: fetches Silero VAD + turn-detector models
 python -m agent.main dev
 ```
+
+**Windows (PowerShell):**
+
+```powershell
+cd agent
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+copy .env.example .env
+python -m agent.main download-files
+python -m agent.main dev
+```
+
+> If you built the venv against an Anaconda-managed Python on Windows, native
+> plugin imports (silero/deepgram/elevenlabs) can segfault - use a clean
+> python.org (or `py -3.11`) interpreter to create `.venv` instead.
 
 The agent registers itself under the name `medication-reminder-agent` and
 waits for explicit dispatches. `POST /calls/start` on the backend creates a
@@ -56,20 +89,34 @@ audio before the mobile app exists: `python agent/test_join.py <url> <token>`.
 
 ## Mobile app setup
 
+**macOS / Linux (zsh/bash):**
+
 ```bash
 cd mobile
 npm install
 cp .env.example .env   # set EXPO_PUBLIC_API_URL to your backend's LAN IP
 ```
 
-LiveKit's React Native SDK (`@livekit/react-native` / `-webrtc`) needs custom
-native modules, so this **cannot run in Expo Go** - it needs a development
-build. On the Mac connected to the iPhone:
+**Windows (PowerShell):**
+
+```powershell
+cd mobile
+npm install
+copy .env.example .env
+```
+
+LiveKit's React Native SDK (`@livekit/react-native` / `-webrtc`) and
+`react-native-callkeep` need custom native modules, so this **cannot run in
+Expo Go** - it needs a development build. This step needs a Mac (Xcode), even
+if the rest of the stack is developed on Windows/Linux:
 
 ```bash
 npx expo prebuild        # generates ios/ and android/ native projects
 npx expo run:ios         # builds and installs the dev client on the device
 ```
+
+CallKit (the native incoming-call UI) also requires a **real iPhone** -
+neither it nor the LiveKit native modules work in the iOS Simulator.
 
 Once the dev client is installed, subsequent iteration is just:
 
