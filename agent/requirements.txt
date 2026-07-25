@@ -1,0 +1,3 @@
+livekit-agents[google,elevenlabs,deepgram,silero,turn-detector]~=1.0
+python-dotenv==1.0.*
+supabase==2.9.*
