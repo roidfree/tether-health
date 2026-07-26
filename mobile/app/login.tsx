@@ -1,11 +1,17 @@
 import { Link, router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, StyleSheet, Text, TextInput, View } from 'react-native';
 
+import AppButton from '../components/AppButton';
+import AuthBackground from '../components/AuthBackground';
+import Logo from '../components/Logo';
 import { useAuth } from '../lib/auth';
+import { useTranslation } from '../lib/i18n';
+import { colors, fonts, inputStyle } from '../lib/theme';
 
 export default function Login() {
   const { signIn } = useAuth();
+  const { t } = useTranslation();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);
@@ -16,50 +22,60 @@ export default function Login() {
       await signIn(email.trim(), password);
       router.replace('/');
     } catch (err: any) {
-      Alert.alert('Log in failed', err.message ?? 'Something went wrong');
+      Alert.alert(t('logInFailed'), err.message ?? 'Something went wrong');
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Welcome back</Text>
+    <AuthBackground>
+      <View style={styles.container}>
+        <View style={styles.logoRow}>
+          <Logo dark={false} size={96} />
+        </View>
+        <Text style={styles.title}>{t('welcomeBack')}</Text>
 
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        autoCapitalize="none"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+        <View style={styles.form}>
+          <TextInput
+            style={inputStyle}
+            placeholder={t('email')}
+            placeholderTextColor={colors.textMuted}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+          />
+          <TextInput
+            style={inputStyle}
+            placeholder={t('password')}
+            placeholderTextColor={colors.textMuted}
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
 
-      <Button title={submitting ? 'Logging in...' : 'Log in'} onPress={onSubmit} disabled={submitting} />
+          <AppButton
+            title={submitting ? t('loggingIn') : t('logIn')}
+            variant="glass"
+            onPress={onSubmit}
+            disabled={submitting}
+            loading={submitting}
+          />
+        </View>
 
-      <Link href="/signup" style={styles.link}>
-        Don't have an account? Sign up
-      </Link>
-    </View>
+        <Link href="/signup" style={styles.link}>
+          {t('noAccountSignUp')}
+        </Link>
+      </View>
+    </AuthBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, justifyContent: 'center', gap: 12 },
-  title: { fontSize: 24, fontWeight: '600', marginBottom: 12 },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-  },
-  link: { marginTop: 16, textAlign: 'center', color: '#2563eb' },
+  container: { flex: 1, padding: 24, justifyContent: 'center', gap: 20 },
+  logoRow: { alignItems: 'center', marginBottom: 56 },
+  title: { fontSize: 26, fontFamily: fonts.extraBold, color: colors.textOnPrimary, letterSpacing: -0.5 },
+  form: { gap: 12 },
+  link: { marginTop: 16, textAlign: 'center', color: colors.textOnPrimaryMuted, fontFamily: fonts.semiBold },
 });

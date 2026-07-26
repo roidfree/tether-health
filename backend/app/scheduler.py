@@ -3,6 +3,12 @@ scheduled_times matches the current time.
 
 Polls rather than using precise per-medication timers - simple and reliable
 enough for a hackathon scope. Runs inside the FastAPI process.
+
+scheduled_times are entered on the phone as plain local wall-clock strings
+(no timezone info collected at onboarding), so comparisons here use the
+backend server's local timezone rather than UTC - correct as long as the
+backend runs in the same timezone as the user, which holds for this
+single-location hackathon setup.
 """
 
 import asyncio
@@ -22,7 +28,7 @@ async def check_and_trigger_reminders() -> None:
     settings = get_settings()
     client = get_service_client()
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now().astimezone()
     current_hhmm = now.strftime("%H:%M")
     # schema convention: days_of_week is 0=Sunday..6=Saturday, but Python's
     # weekday() is 0=Monday..6=Sunday - convert.
@@ -98,10 +104,64 @@ async def check_and_trigger_reminders() -> None:
             )
 
 
+async def check_and_trigger_snoozed_callbacks() -> None:
+    """Fires the actual callback call once a "call me back in N minutes"
+    snooze has come due. snoozed_until is a real instant (timestamptz), so
+    unlike the wall-clock HH:MM matching above this compares fine in UTC.
+    """
+    settings = get_settings()
+    client = get_service_client()
+    now = datetime.now(timezone.utc)
+
+    due = (
+        client.table("medication_logs")
+        .select("*")
+        .eq("status", "snoozed")
+        .lte("snoozed_until", now.isoformat())
+        .execute()
+    )
+
+    for log in due.data:
+        # Flip out of 'snoozed' immediately so a slow call dispatch can't
+        # cause the next tick to pick up and fire this same log twice.
+        client.table("medication_logs").update(
+            {"status": "pending", "snoozed_until": None}
+        ).eq("id", log["id"]).execute()
+
+        medication = (
+            client.table("medications").select("*").eq("id", log["medication_id"]).single().execute()
+        )
+        if not medication.data:
+            continue
+
+        profile = (
+            client.table("profiles").select("*").eq("id", log["user_id"]).single().execute()
+        )
+
+        try:
+            await create_room_and_dispatch(
+                client,
+                settings,
+                user_id=log["user_id"],
+                medication=medication.data,
+                profile=profile.data,
+                medication_log_id=log["id"],
+            )
+            logger.info(
+                "Triggered snoozed callback: medication=%s medication_log=%s user=%s",
+                medication.data["name"],
+                log["id"],
+                log["user_id"],
+            )
+        except Exception:
+            logger.exception("Failed to trigger snoozed callback for medication_log %s", log["id"])
+
+
 async def run_scheduler_loop() -> None:
     while True:
         try:
             await check_and_trigger_reminders()
+            await check_and_trigger_snoozed_callbacks()
         except Exception:
             logger.exception("Scheduler tick failed")
         await asyncio.sleep(POLL_INTERVAL_SECONDS)

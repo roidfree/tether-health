@@ -17,6 +17,10 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class RefreshRequest(BaseModel):
+    refresh_token: str
+
+
 class AuthResponse(BaseModel):
     access_token: str
     refresh_token: str | None
@@ -25,6 +29,9 @@ class AuthResponse(BaseModel):
 
 
 # --- Onboarding / profile ----------------------------------------------
+
+Role = Literal["independent", "carer"]
+
 
 class ProfileUpdate(BaseModel):
     full_name: str | None = None
@@ -45,6 +52,10 @@ class ProfileResponse(BaseModel):
     accountability_partner_name: str | None
     accountability_partner_relationship: str | None
     onboarding_completed: bool
+    role: Role
+    # True once a carer has linked to this profile - they lose medication
+    # write access at that point (see app/deps.py resolve_target_user).
+    is_managed: bool = False
 
 
 # --- Medications ---------------------------------------------------------
@@ -106,9 +117,18 @@ class MedicationLogResponse(BaseModel):
     snoozed_until: datetime | None
 
 
+class MedicationLogWithMedicationResponse(MedicationLogResponse):
+    # Only populated for the /dashboard endpoint, which joins the medication
+    # name in Python (same pattern as GET /carer/alerts) so the mobile history
+    # tab can show it without a second round trip - create/update log
+    # endpoints just return the bare medication_logs row, so they keep using
+    # the base MedicationLogResponse.
+    medication_name: str
+
+
 class DashboardResponse(BaseModel):
     medications: list[MedicationResponse]
-    recent_logs: list[MedicationLogResponse]
+    recent_logs: list[MedicationLogWithMedicationResponse]
 
 
 # --- Calls (LiveKit) -----------------------------------------------------
@@ -129,3 +149,30 @@ class CallStartResponse(BaseModel):
 class CallOutcomeUpdate(BaseModel):
     status: Literal["ringing", "in_progress", "completed", "missed", "failed"]
     outcome: str | None = None
+
+
+# --- Carer accounts --------------------------------------------------------
+
+class CarerInviteCodeResponse(BaseModel):
+    code: str
+    expires_at: datetime
+
+
+class CarerLinkRequest(BaseModel):
+    code: str
+
+
+class CaredForSummary(BaseModel):
+    id: str
+    full_name: str
+
+
+class CarerAlert(BaseModel):
+    id: str
+    cared_for_id: str
+    cared_for_name: str
+    medication_id: str
+    medication_name: str
+    scheduled_for: datetime
+    status: LogStatus
+    attempt_count: int

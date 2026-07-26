@@ -1,11 +1,16 @@
 import { Link, router } from 'expo-router';
 import { useState } from 'react';
-import { Alert, Button, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Alert, StyleSheet, Text, TextInput, View } from 'react-native';
 
+import AppButton from '../components/AppButton';
+import AuthBackground from '../components/AuthBackground';
 import { useAuth } from '../lib/auth';
+import { useTranslation } from '../lib/i18n';
+import { colors, fonts, inputStyle } from '../lib/theme';
 
 export default function Signup() {
   const { signUp } = useAuth();
+  const { t } = useTranslation();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -13,7 +18,7 @@ export default function Signup() {
 
   const onSubmit = async () => {
     if (password.length < 8) {
-      Alert.alert('Password too short', 'Use at least 8 characters.');
+      Alert.alert(t('passwordTooShort'), t('useAtLeast8Chars'));
       return;
     }
     setSubmitting(true);
@@ -21,51 +26,63 @@ export default function Signup() {
       await signUp(email.trim(), password, fullName.trim());
       router.replace('/');
     } catch (err: any) {
-      Alert.alert('Sign up failed', err.message ?? 'Something went wrong');
+      Alert.alert(t('signUpFailed'), err.message ?? 'Something went wrong');
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Create your account</Text>
+    <AuthBackground>
+      <View style={styles.container}>
+        <Text style={styles.title}>{t('createYourAccount')}</Text>
 
-      <TextInput style={styles.input} placeholder="Full name" value={fullName} onChangeText={setFullName} />
-      <TextInput
-        style={styles.input}
-        placeholder="Email"
-        autoCapitalize="none"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Password (min 8 characters)"
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-      />
+        <View style={styles.form}>
+          <TextInput
+            style={inputStyle}
+            placeholder={t('fullName')}
+            placeholderTextColor={colors.textMuted}
+            value={fullName}
+            onChangeText={setFullName}
+          />
+          <TextInput
+            style={inputStyle}
+            placeholder={t('email')}
+            placeholderTextColor={colors.textMuted}
+            autoCapitalize="none"
+            keyboardType="email-address"
+            value={email}
+            onChangeText={setEmail}
+          />
+          <TextInput
+            style={inputStyle}
+            placeholder={t('passwordMin8')}
+            placeholderTextColor={colors.textMuted}
+            secureTextEntry
+            value={password}
+            onChangeText={setPassword}
+          />
 
-      <Button title={submitting ? 'Creating account...' : 'Sign up'} onPress={onSubmit} disabled={submitting} />
+          <AppButton
+            title={submitting ? t('creatingAccount') : t('signUp')}
+            variant="glass"
+            onPress={onSubmit}
+            disabled={submitting}
+            loading={submitting}
+          />
+        </View>
 
-      <Link href="/login" style={styles.link}>
-        Already have an account? Log in
-      </Link>
-    </View>
+        <Link href="/login" style={styles.link}>
+          {t('haveAccountLogIn')}
+        </Link>
+      </View>
+    </AuthBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, justifyContent: 'center', gap: 12 },
-  title: { fontSize: 24, fontWeight: '600', marginBottom: 12 },
-  input: {
-    borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-  },
-  link: { marginTop: 16, textAlign: 'center', color: '#2563eb' },
+  container: { flex: 1, padding: 24, justifyContent: 'center', gap: 20 },
+  title: { fontSize: 26, fontFamily: fonts.extraBold, color: colors.textOnPrimary, letterSpacing: -0.5 },
+  form: { gap: 12 },
+  link: { marginTop: 16, textAlign: 'center', color: colors.textOnPrimaryMuted, fontFamily: fonts.semiBold },
 });

@@ -1,10 +1,14 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.db.supabase_client import get_service_client
-from app.deps import CurrentUser, get_current_user
+from app.deps import CurrentUser, get_current_user, is_managed_by_carer
 from app.models.schemas import ProfileResponse, ProfileUpdate
 
 router = APIRouter(prefix="/profile", tags=["profile"])
+
+
+def _with_managed_flag(client, profile: dict) -> dict:
+    return {**profile, "is_managed": is_managed_by_carer(client, profile["id"])}
 
 
 @router.get("", response_model=ProfileResponse)
@@ -15,7 +19,7 @@ def get_profile(current_user: CurrentUser = Depends(get_current_user)):
     )
     if not result.data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
-    return result.data
+    return _with_managed_flag(client, result.data)
 
 
 @router.put("", response_model=ProfileResponse)
@@ -32,4 +36,4 @@ def update_profile(
     )
     if not result.data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Profile not found")
-    return result.data[0]
+    return _with_managed_flag(client, result.data[0])

@@ -23,6 +23,17 @@ async def create_room_and_dispatch(
 ) -> dict:
     room_name = f"reminder-{uuid.uuid4().hex[:12]}"
 
+    # Every callback for the same dose (snoozed follow-ups, manual "call me
+    # back now" taps) shares this medication_log_id - count prior calls
+    # against it so the agent can escalate urgency the more attempts there
+    # have been, without needing a separate counter column.
+    attempt_number = 1
+    if medication_log_id:
+        previous_calls = (
+            client.table("calls").select("id").eq("medication_log_id", medication_log_id).execute()
+        )
+        attempt_number = len(previous_calls.data) + 1
+
     call_row = (
         client.table("calls")
         .insert(
@@ -42,6 +53,7 @@ async def create_room_and_dispatch(
     # its dosage/frequency, the current time, and who it's calling.
     metadata = {
         "call_id": call["id"],
+        "medication_log_id": medication_log_id,
         "user_id": user_id,
         "user_name": profile.get("full_name") if profile else None,
         "preferred_language": profile.get("preferred_language", "en") if profile else "en",
@@ -54,6 +66,7 @@ async def create_room_and_dispatch(
             "scheduled_times": medication.get("scheduled_times", []),
         },
         "current_time_iso": datetime.now(timezone.utc).isoformat(),
+        "attempt_number": attempt_number,
     }
 
     lkapi = api.LiveKitAPI(

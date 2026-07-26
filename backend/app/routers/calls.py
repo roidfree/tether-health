@@ -23,24 +23,32 @@ async def start_call(
     client = get_service_client()
 
     medication = (
-        client.table("medications")
-        .select("*")
-        .eq("id", payload.medication_id)
-        .eq("user_id", current_user.id)
-        .single()
-        .execute()
+        client.table("medications").select("*").eq("id", payload.medication_id).single().execute()
     )
     if not medication.data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Medication not found")
 
-    profile = (
-        client.table("profiles").select("*").eq("id", current_user.id).single().execute()
-    )
+    # The call always rings the medication owner's phone, whoever starts it -
+    # a linked carer can trigger it for their cared-for, but never joins the
+    # room themselves (the access token below is minted for the owner).
+    owner_id = medication.data["user_id"]
+    if owner_id != current_user.id:
+        link = (
+            client.table("carer_links")
+            .select("id")
+            .eq("carer_id", current_user.id)
+            .eq("cared_for_id", owner_id)
+            .execute()
+        )
+        if not link.data:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Medication not found")
+
+    profile = client.table("profiles").select("*").eq("id", owner_id).single().execute()
 
     result = await create_room_and_dispatch(
         client,
         settings,
-        user_id=current_user.id,
+        user_id=owner_id,
         medication=medication.data,
         profile=profile.data,
         medication_log_id=payload.medication_log_id,
@@ -48,7 +56,7 @@ async def start_call(
 
     token = mint_access_token(
         settings,
-        user_id=current_user.id,
+        user_id=owner_id,
         name=profile.data.get("full_name", "Patient") if profile.data else "Patient",
         room_name=result["room_name"],
     )

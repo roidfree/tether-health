@@ -11,6 +11,7 @@
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.tetherhealth.app",
+      "appleTeamId": "244SXYZ9WF",
       "infoPlist": {
         "NSMicrophoneUsageDescription": "Tether Health needs microphone access so you can talk to your medication reminder call.",
         "UIBackgroundModes": ["audio", "voip"]
