@@ -136,7 +136,11 @@ type Key =
   | 'yesterdayLabel'
   | 'carerIntroPrefix'
   | 'carerIntroAccent'
-  | 'allMedicationsTaken';
+  | 'allMedicationsTaken'
+  | 'removeCaredForButton'
+  | 'removeCaredForConfirmTitle'
+  | 'removeCaredForConfirmMessage'
+  | 'couldNotRemoveCaredFor';
 
 const STRINGS: Record<string, Record<Key, string>> = {
   en: {
@@ -272,6 +276,10 @@ const STRINGS: Record<string, Record<Key, string>> = {
     carerIntroPrefix: 'Just a calm',
     carerIntroAccent: 'glance',
     allMedicationsTaken: 'All medications taken',
+    removeCaredForButton: 'Remove from your account',
+    removeCaredForConfirmTitle: 'Remove {{name}}?',
+    removeCaredForConfirmMessage: "You'll stop seeing their medications and alerts. This can't be undone.",
+    couldNotRemoveCaredFor: 'Could not remove this person',
   },
   es: {
     welcomeBack: 'Bienvenido de nuevo',
@@ -406,6 +414,10 @@ const STRINGS: Record<string, Record<Key, string>> = {
     carerIntroPrefix: 'Solo un vistazo',
     carerIntroAccent: 'tranquilo',
     allMedicationsTaken: 'Todos los medicamentos tomados',
+    removeCaredForButton: 'Quitar de tu cuenta',
+    removeCaredForConfirmTitle: '¿Quitar a {{name}}?',
+    removeCaredForConfirmMessage: 'Dejarás de ver sus medicamentos y alertas. Esto no se puede deshacer.',
+    couldNotRemoveCaredFor: 'No se pudo quitar a esta persona',
   },
   fr: {
     welcomeBack: 'Content de vous revoir',
@@ -540,6 +552,10 @@ const STRINGS: Record<string, Record<Key, string>> = {
     carerIntroPrefix: "Juste un coup d'œil",
     carerIntroAccent: 'tranquille',
     allMedicationsTaken: 'Tous les médicaments pris',
+    removeCaredForButton: 'Retirer de votre compte',
+    removeCaredForConfirmTitle: 'Retirer {{name}} ?',
+    removeCaredForConfirmMessage: 'Vous ne verrez plus ses médicaments ni ses alertes. Cette action est irréversible.',
+    couldNotRemoveCaredFor: "Impossible de retirer cette personne",
   },
   de: {
     welcomeBack: 'Willkommen zurück',
@@ -674,6 +690,10 @@ const STRINGS: Record<string, Record<Key, string>> = {
     carerIntroPrefix: 'Nur ein ruhiger',
     carerIntroAccent: 'Blick',
     allMedicationsTaken: 'Alle Medikamente eingenommen',
+    removeCaredForButton: 'Aus deinem Konto entfernen',
+    removeCaredForConfirmTitle: '{{name}} entfernen?',
+    removeCaredForConfirmMessage: 'Du siehst dann keine Medikamente oder Warnungen mehr. Dies kann nicht rückgängig gemacht werden.',
+    couldNotRemoveCaredFor: 'Diese Person konnte nicht entfernt werden',
   },
   pt: {
     welcomeBack: 'Bem-vindo de volta',
@@ -808,6 +828,10 @@ const STRINGS: Record<string, Record<Key, string>> = {
     carerIntroPrefix: 'Só um olhar',
     carerIntroAccent: 'tranquilo',
     allMedicationsTaken: 'Todos os medicamentos tomados',
+    removeCaredForButton: 'Remover da sua conta',
+    removeCaredForConfirmTitle: 'Remover {{name}}?',
+    removeCaredForConfirmMessage: 'Você deixará de ver os medicamentos e alertas dela. Isso não pode ser desfeito.',
+    couldNotRemoveCaredFor: 'Não foi possível remover essa pessoa',
   },
   hi: {
     welcomeBack: 'वापसी पर स्वागत है',
@@ -942,6 +966,10 @@ const STRINGS: Record<string, Record<Key, string>> = {
     carerIntroPrefix: 'बस एक',
     carerIntroAccent: 'शांत नज़र',
     allMedicationsTaken: 'सभी दवाएं ली जा चुकी हैं',
+    removeCaredForButton: 'अपने खाते से हटाएं',
+    removeCaredForConfirmTitle: '{{name}} को हटाएं?',
+    removeCaredForConfirmMessage: 'अब आपको उनकी दवाएं और अलर्ट नहीं दिखेंगे। यह पूर्ववत नहीं किया जा सकता।',
+    couldNotRemoveCaredFor: 'इस व्यक्ति को हटाया नहीं जा सका',
   },
   zh: {
     welcomeBack: '欢迎回来',
@@ -1076,6 +1104,10 @@ const STRINGS: Record<string, Record<Key, string>> = {
     carerIntroPrefix: '只需',
     carerIntroAccent: '安心一瞥',
     allMedicationsTaken: '所有用药均已完成',
+    removeCaredForButton: '从您的账户中移除',
+    removeCaredForConfirmTitle: '移除{{name}}？',
+    removeCaredForConfirmMessage: '您将不再看到其用药和提醒。此操作无法撤销。',
+    couldNotRemoveCaredFor: '无法移除此人',
   },
   ja: {
     welcomeBack: 'おかえりなさい',
@@ -1210,6 +1242,10 @@ const STRINGS: Record<string, Record<Key, string>> = {
     carerIntroPrefix: '必要なのは',
     carerIntroAccent: '穏やかな一瞥だけ',
     allMedicationsTaken: 'すべての服薬が完了しました',
+    removeCaredForButton: 'アカウントから削除',
+    removeCaredForConfirmTitle: '{{name}}さんを削除しますか？',
+    removeCaredForConfirmMessage: '今後、服薬状況やアラートは表示されなくなります。この操作は元に戻せません。',
+    couldNotRemoveCaredFor: 'この方を削除できませんでした',
   },
 };
 

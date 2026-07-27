@@ -123,6 +123,22 @@ def list_cared_for(current_user: CurrentUser = Depends(get_current_user)):
     return profiles.data
 
 
+@router.delete("/cared-for/{cared_for_id}", status_code=status.HTTP_204_NO_CONTENT)
+def unlink_cared_for(cared_for_id: str, current_user: CurrentUser = Depends(get_current_user)):
+    client = get_service_client()
+    result = (
+        client.table("carer_links")
+        .delete()
+        .eq("carer_id", current_user.id)
+        .eq("cared_for_id", cared_for_id)
+        .execute()
+    )
+    if not result.data:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Not linked to this cared-for account"
+        )
+
+
 @router.get("/alerts", response_model=list[CarerAlert])
 def get_alerts(
     cared_for_id: str | None = Query(None), current_user: CurrentUser = Depends(get_current_user)

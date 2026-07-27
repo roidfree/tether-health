@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import * as api from '../lib/api';
@@ -20,7 +20,11 @@ import AppButton from './AppButton';
 // one) and the language label is generic rather than "for calls" - carers
 // never receive reminder calls themselves, this only changes the app's UI
 // text.
-export default function CarerSettingsPanel() {
+// `children`, when given, renders between the language section and logout -
+// used by the per-cared-for Settings tab to add a "remove this person"
+// section that's specific to whichever cared-for is currently open, without
+// nesting a second ScrollView inside this one.
+export default function CarerSettingsPanel({ children }: { children?: ReactNode }) {
   const { token, profile, refreshProfile, signOut } = useAuth();
   const { t } = useTranslation();
 
@@ -57,6 +61,8 @@ export default function CarerSettingsPanel() {
           </Text>
         ))}
       </View>
+
+      {children}
 
       <View style={styles.logoutRow}>
         <AppButton title={t('logOut')} variant="danger" onPress={signOut} />

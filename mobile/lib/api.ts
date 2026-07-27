@@ -309,3 +309,7 @@ export function listCaredFor(token: string) {
 export function getCarerAlerts(token: string, caredForId?: string) {
   return request<CarerAlert[]>(withQuery('/carer/alerts', { cared_for_id: caredForId }), { token });
 }
+
+export function unlinkCaredFor(token: string, caredForId: string) {
+  return request<void>(`/carer/cared-for/${caredForId}`, { method: 'DELETE', token });
+}
