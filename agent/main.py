@@ -255,6 +255,17 @@ async def entrypoint(ctx: JobContext):
 
     await session.start(agent=agent, room=ctx.room)
 
+    # The agent is dispatched into the room as soon as the backend creates
+    # it - often well before the human actually answers (CallKit ring delay,
+    # app connect time, etc). Without this wait, generate_reply below fires
+    # immediately and the greeting plays into an empty room: the human joins
+    # to an agent that already "used" its opening turn and is just sitting
+    # there waiting for a reply to a question it never asked them, which
+    # looks like "the agent doesn't talk" even though it did, once, to no
+    # one. Waiting here means the greeting always has an actual listener.
+    logger.info("Waiting for a participant to join before greeting")
+    await ctx.wait_for_participant()
+
     greeting_name = metadata.get("user_name") or "there"
     await session.generate_reply(
         instructions=f"Greet {greeting_name} warmly in {language_name} and bring up their medication reminder."
