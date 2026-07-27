@@ -140,7 +140,8 @@ type Key =
   | 'removeCaredForButton'
   | 'removeCaredForConfirmTitle'
   | 'removeCaredForConfirmMessage'
-  | 'couldNotRemoveCaredFor';
+  | 'couldNotRemoveCaredFor'
+  | 'linkCaredForButton';
 
 const STRINGS: Record<string, Record<Key, string>> = {
   en: {
@@ -280,6 +281,7 @@ const STRINGS: Record<string, Record<Key, string>> = {
     removeCaredForConfirmTitle: 'Remove {{name}}?',
     removeCaredForConfirmMessage: "You'll stop seeing their medications and alerts. This can't be undone.",
     couldNotRemoveCaredFor: 'Could not remove this person',
+    linkCaredForButton: 'Link a cared-for person',
   },
   es: {
     welcomeBack: 'Bienvenido de nuevo',
@@ -418,6 +420,7 @@ const STRINGS: Record<string, Record<Key, string>> = {
     removeCaredForConfirmTitle: '¿Quitar a {{name}}?',
     removeCaredForConfirmMessage: 'Dejarás de ver sus medicamentos y alertas. Esto no se puede deshacer.',
     couldNotRemoveCaredFor: 'No se pudo quitar a esta persona',
+    linkCaredForButton: 'Vincular a una persona a tu cuidado',
   },
   fr: {
     welcomeBack: 'Content de vous revoir',
@@ -556,6 +559,7 @@ const STRINGS: Record<string, Record<Key, string>> = {
     removeCaredForConfirmTitle: 'Retirer {{name}} ?',
     removeCaredForConfirmMessage: 'Vous ne verrez plus ses médicaments ni ses alertes. Cette action est irréversible.',
     couldNotRemoveCaredFor: "Impossible de retirer cette personne",
+    linkCaredForButton: 'Lier une personne dont vous vous occupez',
   },
   de: {
     welcomeBack: 'Willkommen zurück',
@@ -694,6 +698,7 @@ const STRINGS: Record<string, Record<Key, string>> = {
     removeCaredForConfirmTitle: '{{name}} entfernen?',
     removeCaredForConfirmMessage: 'Du siehst dann keine Medikamente oder Warnungen mehr. Dies kann nicht rückgängig gemacht werden.',
     couldNotRemoveCaredFor: 'Diese Person konnte nicht entfernt werden',
+    linkCaredForButton: 'Betreute Person verknüpfen',
   },
   pt: {
     welcomeBack: 'Bem-vindo de volta',
@@ -832,6 +837,7 @@ const STRINGS: Record<string, Record<Key, string>> = {
     removeCaredForConfirmTitle: 'Remover {{name}}?',
     removeCaredForConfirmMessage: 'Você deixará de ver os medicamentos e alertas dela. Isso não pode ser desfeito.',
     couldNotRemoveCaredFor: 'Não foi possível remover essa pessoa',
+    linkCaredForButton: 'Vincular uma pessoa cuidada',
   },
   hi: {
     welcomeBack: 'वापसी पर स्वागत है',
@@ -970,6 +976,7 @@ const STRINGS: Record<string, Record<Key, string>> = {
     removeCaredForConfirmTitle: '{{name}} को हटाएं?',
     removeCaredForConfirmMessage: 'अब आपको उनकी दवाएं और अलर्ट नहीं दिखेंगे। यह पूर्ववत नहीं किया जा सकता।',
     couldNotRemoveCaredFor: 'इस व्यक्ति को हटाया नहीं जा सका',
+    linkCaredForButton: 'देखभाल किए जा रहे व्यक्ति को लिंक करें',
   },
   zh: {
     welcomeBack: '欢迎回来',
@@ -1108,6 +1115,7 @@ const STRINGS: Record<string, Record<Key, string>> = {
     removeCaredForConfirmTitle: '移除{{name}}？',
     removeCaredForConfirmMessage: '您将不再看到其用药和提醒。此操作无法撤销。',
     couldNotRemoveCaredFor: '无法移除此人',
+    linkCaredForButton: '关联一位被照护者',
   },
   ja: {
     welcomeBack: 'おかえりなさい',
@@ -1246,6 +1254,7 @@ const STRINGS: Record<string, Record<Key, string>> = {
     removeCaredForConfirmTitle: '{{name}}さんを削除しますか？',
     removeCaredForConfirmMessage: '今後、服薬状況やアラートは表示されなくなります。この操作は元に戻せません。',
     couldNotRemoveCaredFor: 'この方を削除できませんでした',
+    linkCaredForButton: '介護対象者をリンク',
   },
 };
 
